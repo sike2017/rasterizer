@@ -1,10 +1,11 @@
 #pragma once
-#include <string>
 #include <Windows.h>
 #include <assert.h>
-#include <memory>
-#include "image_png.h"
 #include "log/log.h"
+#include "image_png.h"
+
+using std::string;
+using std::unique_ptr;
 
 class RGBA
 {
@@ -28,7 +29,7 @@ public:
 };
 
 RGBA operator*(const float& left, const RGBA& right);
-std::unique_ptr<wchar_t[]> ConvertStringToLPCWSTR(const std::string& str);
+
 class RenderBitmap
 {
 public:
@@ -36,7 +37,7 @@ public:
 	RenderBitmap(int width, int height);
 	~RenderBitmap();
 
-	bool loadBitmapFromFile(const std::string& filename);
+	bool loadBitmapFromFile(string fileName);
 	HBITMAP getHBitmap();
 	int getWidth();
 	int getHeight();
@@ -47,7 +48,6 @@ public:
 private:
 	int convertSoftwareCoordinateToDeviceCoordinateX(int x);
 	int convertSoftwareCoordinateToDeviceCoordinateY(int y);
-
 	uint32_t bgra_to_rgba(uint32_t& rgba);
 	int bmPlanes;           // The number of bitmap plans.
 	int bmColorSize;        // The number of bits required to indicate the color of a pixel.
@@ -68,7 +68,7 @@ public:
 	void SetFrameBitmapBuffer(RenderBitmap* bitmap);
 	bool PainterBeginPaint();
 	bool PainterEndPaint();
-	bool DrawBitmapFromFile(const std::string& filename = "");
+	bool DrawBitmapFromFile(string fileName = "");
 
 	bool UpdateFrame();
 	bool DrawFrame();

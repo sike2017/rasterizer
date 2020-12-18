@@ -1,4 +1,4 @@
-#include "painter.h"
+#include "Painter.h"
 
 RGBA::RGBA()
 {
@@ -206,13 +206,14 @@ RGBA operator*(const float& left, const RGBA& right) {
 	return right.mul(left);
 }
 
-std::unique_ptr<wchar_t[]> ConvertStringToLPCWSTR(const std::string& str) {
+unique_ptr<wchar_t[]> ConvertStringToLPCWSTR(string& str)
+{
 	size_t length = str.length();
 	int size = MultiByteToWideChar(CP_ACP, 0, str.c_str(), length, NULL, 0);
 	wchar_t* buffer = new wchar_t[size + 1];
 	MultiByteToWideChar(CP_UTF8, 0, str.c_str(), length, buffer, size);
 	buffer[size] = '\0';
-	return std::unique_ptr<wchar_t[]>(buffer);
+	return unique_ptr<wchar_t[]>(buffer);
 }
 
 RenderBitmap::RenderBitmap(int width, int height)
@@ -248,9 +249,10 @@ RenderBitmap::~RenderBitmap()
 	cleanUp();
 }
 
-bool RenderBitmap::loadBitmapFromFile(const std::string& filename)
+bool RenderBitmap::loadBitmapFromFile(string fileName)
 {
-	HANDLE loadResult = LoadImage(NULL, filename.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	unique_ptr<wchar_t[]> p = ConvertStringToLPCWSTR(fileName);
+	HANDLE loadResult = LoadImage(NULL, p.get(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	if (!loadResult)
 	{
 		rlog.print("load failed\n");
@@ -385,11 +387,13 @@ bool Painter::PainterEndPaint()
 	return static_cast<bool>(EndPaint(m_hwnd, &m_PaintStruct));
 }
 
-bool Painter::DrawBitmapFromFile(const std::string& filename)
+bool Painter::DrawBitmapFromFile(string fileName)
 {
 	HBITMAP hBitmap;
 
-	hBitmap = static_cast<HBITMAP>(LoadImage(NULL, filename.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
+	unique_ptr<wchar_t[]> p = ConvertStringToLPCWSTR(fileName);
+
+	hBitmap = static_cast<HBITMAP>(LoadImage(NULL, p.get(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
 
 	GetObject(hBitmap, sizeof(BITMAP), &m_bitmap);
 

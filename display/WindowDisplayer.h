@@ -1,6 +1,8 @@
 #pragma once
 #include <Windows.h>
-#include "painter.h"
+#include "Painter.h"
+
+#include "log/log.h"
 
 extern Painter painter;
 
@@ -13,7 +15,7 @@ namespace display
 class WindowDisplayer
 {
 public:
-	WindowDisplayer(HINSTANCE thInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow, int twidth, int theight, const TCHAR* twindowName);
+	WindowDisplayer(HINSTANCE thInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow, int twidth, int theight, const wchar_t* twindowName);
 	~WindowDisplayer() {}
 
 	int display();
@@ -38,6 +40,8 @@ protected:
 	RENDER_STATUS renderStatus;
 
 	virtual RENDER_STATUS render() {
+		rlog.print("virtual render\n");
+
 		RGBA color0(0, 162, 232, 0);
 		RGBA color1(112, 146, 190, 0);
 
@@ -68,7 +72,7 @@ private:
 	HINSTANCE hPrevInstance;
 	LPSTR szCmdLine;
 	int iCmdShow;
-	const TCHAR* windowName;
+	std::wstring windowName;
 	
 	RenderBitmap rb;
 

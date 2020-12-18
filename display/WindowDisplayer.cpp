@@ -1,8 +1,8 @@
-#include "wdisplayer.h"
+#include "WindowDisplayer.h"
 
 Painter painter;
 
-WindowDisplayer::WindowDisplayer(HINSTANCE thInstance, HINSTANCE thPrevInstance, LPSTR tszCmdLine, int tiCmdShow, int twidth, int theight, const TCHAR* twindowName) :
+WindowDisplayer::WindowDisplayer(HINSTANCE thInstance, HINSTANCE thPrevInstance, LPSTR tszCmdLine, int tiCmdShow, int twidth, int theight, const wchar_t* twindowName) :
 	hInstance(thInstance), hPrevInstance(thPrevInstance), szCmdLine(tszCmdLine), iCmdShow(tiCmdShow), _width(twidth), _height(theight), windowName(twindowName), rb(twidth, theight), 
 	colorIndex(0), renderStatus(RENDER_STATUS::CALL_NEXTTIME)
 {
@@ -35,8 +35,8 @@ int WindowDisplayer::height() const {
 int WindowDisplayer::InitWindow()
 {
 	/*static TCHAR szAppName[] = TEXT("RayTracing");*/
-	const TCHAR* szAppName = windowName;
-	const TCHAR* szWindowName = windowName;
+	const TCHAR* szAppName = windowName.c_str();
+	const TCHAR* szWindowName = windowName.c_str();
 	HWND         hwnd;
 	MSG          msg;
 	WNDCLASS     wndclass = { 0 };

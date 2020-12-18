@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="display">
+      <UniqueIdentifier>{4563f7cb-a96a-4c5c-b7ae-9a68c7438bd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{9b0e60f7-e8d9-41f6-804f-44af56cc690e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="log">
+      <UniqueIdentifier>{5e709174-4c9d-49db-b996-25e1c50b23f3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="display\image_png.cpp">
+      <Filter>display</Filter>
+    </ClCompile>
+    <ClCompile Include="log\log.cpp">
+      <Filter>log</Filter>
+    </ClCompile>
+    <ClCompile Include="rasterizer.cpp" />
+    <ClCompile Include="monolith_math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="display\Painter.cpp">
+      <Filter>display</Filter>
+    </ClCompile>
+    <ClCompile Include="display\WindowDisplayer.cpp">
+      <Filter>display</Filter>
+    </ClCompile>
+    <ClCompile Include="win_main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="display\image_png.h">
+      <Filter>display</Filter>
+    </ClInclude>
+    <ClInclude Include="log\log.h">
+      <Filter>log</Filter>
+    </ClInclude>
+    <ClInclude Include="color.h" />
+    <ClInclude Include="rasterizer.h" />
+    <ClInclude Include="math\monolith_math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="display\Painter.h">
+      <Filter>display</Filter>
+    </ClInclude>
+    <ClInclude Include="display\WindowDisplayer.h">
+      <Filter>display</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
