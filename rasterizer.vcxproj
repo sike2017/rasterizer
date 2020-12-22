@@ -19,22 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="core\camera.cpp" />
+    <ClCompile Include="core\rasterizer.cpp" />
+    <ClCompile Include="core\win_main.cpp" />
     <ClCompile Include="display\image_png.cpp" />
     <ClCompile Include="display\Painter.cpp" />
     <ClCompile Include="display\WindowDisplayer.cpp" />
     <ClCompile Include="log\log.cpp" />
-    <ClCompile Include="win_main.cpp" />
-    <ClCompile Include="monolith_math.cpp" />
-    <ClCompile Include="rasterizer.cpp" />
+    <ClCompile Include="math\monolith_math.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="color.h" />
+    <ClInclude Include="core\camera.h" />
+    <ClInclude Include="core\color.h" />
+    <ClInclude Include="core\mesh.h" />
+    <ClInclude Include="core\rasterizer.h" />
+    <ClInclude Include="core\transformation.h" />
     <ClInclude Include="display\image_png.h" />
     <ClInclude Include="display\Painter.h" />
     <ClInclude Include="display\WindowDisplayer.h" />
     <ClInclude Include="log\log.h" />
     <ClInclude Include="math\monolith_math.h" />
-    <ClInclude Include="rasterizer.h" />
+    <ClInclude Include="parser\file_parser.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

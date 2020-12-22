@@ -5,7 +5,7 @@
 class Vector4f
 {
 public:
-	Vector4f(float tx = 0, float ty = 0, float tz = 0, float tw = 0) { e[0] = tx; e[1] = ty; e[2] = tz; e[3] = tz; }
+	Vector4f(float _x = 0, float _y = 0, float _z = 0, float _w = 0) { e[0] = _x; e[1] = _y; e[2] = _z; e[3] = _w; }
 	~Vector4f() {}
 
 	inline float x() const { return e[0]; }
@@ -84,12 +84,6 @@ public:
 	inline float squared_length() const {
 		return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
 	}
-	inline Vector4f normalize() const {
-		Vector4f ret = *this;
-		float k = 1.0 / sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
-		ret.e[0] *= k; ret.e[1] *= k; ret.e[2] *= k;
-		return ret;
-	}
 
 	float e[4];
 };
@@ -119,6 +113,13 @@ inline Vector4f operator*(float left, const Vector4f& right) {
 
 typedef Vector4f Vector3f;
 typedef Vector4f Vector2f;
+
+inline Vector4f unit_vector(const Vector3f& v) {
+	Vector4f ret = v;
+	float k = 1.0 / sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z());
+	ret.e[0] *= k; ret.e[1] *= k; ret.e[2] *= k;
+	return ret;
+}
 
 inline float dot(const Vector3f& v0, const Vector3f& v1) {
 	return v0.e[0] * v1.e[0] + v0.e[1] * v1.e[1] + v0.e[2] * v1.e[2];
