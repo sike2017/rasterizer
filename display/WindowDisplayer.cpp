@@ -1,6 +1,7 @@
 #include "WindowDisplayer.h"
 
 Painter painter;
+int display::screen_keys[512];
 
 WindowDisplayer::WindowDisplayer(HINSTANCE thInstance, HINSTANCE thPrevInstance, LPSTR tszCmdLine, int tiCmdShow, int twidth, int theight, const wchar_t* twindowName) :
 	hInstance(thInstance), hPrevInstance(thPrevInstance), szCmdLine(tszCmdLine), iCmdShow(tiCmdShow), _width(twidth), _height(theight), windowName(twindowName), rb(twidth, theight), 
@@ -90,10 +91,11 @@ int WindowDisplayer::InitWindow()
 			case RENDER_STATUS::CALL_STOP:
 				break;
 			case RENDER_STATUS::CALL_STOP_SAVE_IMAGE:
-				rb.saveBitmap("untitled.png");
+				rb.saveBitmap("image.png");
 				renderStatus = RENDER_STATUS::CALL_STOP;
 				break;
 			}
+			keyboardEvent(display::screen_keys);
 		}
 	}
 	return msg.wParam;
@@ -108,7 +110,13 @@ LRESULT CALLBACK display::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 		painter.Initialize(hwnd);
 		return 0;
 
-	//case WM_KEYDOWN:
+	case WM_KEYDOWN:
+		screen_keys[wParam & 511] = 1;
+		break;
+
+	case WM_KEYUP:
+		screen_keys[wParam & 511] = 0;
+		break;
 
 	case WM_PAINT:
 

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\camera.cpp" />
+    <ClCompile Include="core\culling.cpp" />
     <ClCompile Include="core\rasterizer.cpp" />
     <ClCompile Include="core\win_main.cpp" />
     <ClCompile Include="display\image_png.cpp" />
@@ -31,9 +32,17 @@
   <ItemGroup>
     <ClInclude Include="core\camera.h" />
     <ClInclude Include="core\color.h" />
+    <ClInclude Include="core\culling.h" />
     <ClInclude Include="core\mesh.h" />
+    <ClInclude Include="core\primitive.h" />
     <ClInclude Include="core\rasterizer.h" />
+    <ClInclude Include="core\render_thread.h" />
+    <ClInclude Include="core\rz_types.h" />
+    <ClInclude Include="core\material.h" />
+    <ClInclude Include="core\textbar.h" />
     <ClInclude Include="core\transformation.h" />
+    <ClInclude Include="core\triangle.h" />
+    <ClInclude Include="core\zbuffer.h" />
     <ClInclude Include="display\image_png.h" />
     <ClInclude Include="display\Painter.h" />
     <ClInclude Include="display\WindowDisplayer.h" />
@@ -69,6 +78,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -96,6 +106,9 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>.;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>.;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

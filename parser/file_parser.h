@@ -52,9 +52,9 @@ public:
 		std::string lineStr;
 		Mesh* mesh = new Mesh;
 		int vnIndex = 0;
-		std::vector<Vertex*> vArray;
-		std::vector<Point2f*> vtArray;
-		std::vector<Vector3f*> vnArray;
+		std::vector<Vertex*>& vArray = mesh->vArray;
+		std::vector<Point2f*>& vtArray = mesh->vtArray;
+		std::vector<Vector3f*>& vnArray = mesh->vnArray;
 		while (std::getline(moduleFile, lineStr)) {
 			std::pair<ParserInstruction, std::vector<float>> lineResult;
 			if (lineParse(lineStr, &lineResult)) {
@@ -100,7 +100,7 @@ public:
 						v2 = lineResult.second[2] - 1;
 						vtArray.push_back(new Point2f(0, 0));
 						vt0 = vt1 = vt2 = 0;
-						vnArray.push_back(new Vector3f(0, 0, 1));
+						vnArray.push_back(new Vector3f(computeNormal(vArray[v0]->p, vArray[v1]->p, vArray[v2]->p)));
 						vn0 = vn1 = vn2 = 0;
 						break;
 					case 9:
@@ -157,7 +157,7 @@ private:
 	inline bool isFloatString(const std::string& str) {
 		for (const char& le : str) {
 			if (le != '-' && le != '.' && le != '0' && le != '1' && le != '2' && le != '3' && le != '4'
-				&& le != '5' && le != '6' && le != '7' && le != '8' && le != '9' && le != '+') {
+				&& le != '5' && le != '6' && le != '7' && le != '8' && le != '9' && le != '+' && le != 'e') {
 				return false;
 			}
 		}

@@ -30,9 +30,6 @@
     <ClCompile Include="display\WindowDisplayer.cpp">
       <Filter>display</Filter>
     </ClCompile>
-    <ClCompile Include="core\rasterizer.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="core\win_main.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -40,6 +37,12 @@
       <Filter>math</Filter>
     </ClCompile>
     <ClCompile Include="core\camera.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\rasterizer.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\culling.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -75,6 +78,30 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="core\transformation.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\rz_types.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\material.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\triangle.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\zbuffer.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\culling.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\primitive.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\textbar.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\render_thread.h">
       <Filter>core</Filter>
     </ClInclude>
   </ItemGroup>

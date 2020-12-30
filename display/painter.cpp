@@ -288,11 +288,11 @@ int RenderBitmap::getHeight()
 
 void RenderBitmap::setPixel(int x, int y, RGBA color)
 {
-	assert(x < bmWidth && y < bmHeight);
+	assert(x >= 0 && y >= 0 && x < bmWidth && y < bmHeight);
 
 	x = convertSoftwareCoordinateToDeviceCoordinateX(x);
 	y = convertSoftwareCoordinateToDeviceCoordinateY(y);
-	pBmBits[x + y * bmWidth] = color.toBGRAUint32();
+	pBmBits[y * bmWidth + x] = color.toBGRAUint32();
 }
 
 bool RenderBitmap::cleanUp()

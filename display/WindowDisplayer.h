@@ -9,6 +9,7 @@ extern Painter painter;
 // do not using this namespace in your program!
 namespace display
 {
+	extern int screen_keys[512];
 	LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 }
 
@@ -66,6 +67,7 @@ protected:
 		update();
 		return RENDER_STATUS::CALL_NEXTTIME;
 	}
+	virtual void keyboardEvent(int* screen_keys) {}
 
 private:
 	HINSTANCE hInstance;

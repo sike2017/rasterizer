@@ -70,5 +70,5 @@ inline Matrix4x4f unit_matrix() {
 class Transformer
 {
 public:
-	virtual Matrix4x4f get_transform() = 0;
+	virtual Matrix4x4f get_transform() const = 0;
 };

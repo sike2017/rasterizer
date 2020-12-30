@@ -1,3 +1,4 @@
+#pragma once
 #include "transformation.h"
 #include "mesh.h"
 
@@ -13,7 +14,7 @@ public:
 	}
 	~Camera() {}
 
-	virtual Matrix4x4f get_transform() override {
+	virtual Matrix4x4f get_transform() const override {
 		return Matrix4x4f(u.x(), u.y(), u.z(), 0,
 			v.x(), v.y(), v.z(), 0,
 			w.x(), w.y(), w.z(), 0,
@@ -37,7 +38,7 @@ public:
 	}
 	~Perspective() {}
 
-	virtual Matrix4x4f get_transform() override {
+	virtual Matrix4x4f get_transform() const override {
 		return Matrix4x4f(2 * zNear / (right - left), 0, (left + right) / (left - right), 0,
 			0, 2 * zNear / (top - bottom), (bottom + top) / (bottom - top), 0,
 			0, 0, (zFar + zNear) / (zNear - zFar), 2 * zFar * zNear / (zFar - zNear),
@@ -50,7 +51,7 @@ public:
 class Viewport : public Transformer {
 public:
 	Viewport(int _width, int _height): width(_width), height(_height) {}
-	virtual Matrix4x4f get_transform() override {
+	virtual Matrix4x4f get_transform() const override {
 		float half_width = width / 2.0;
 		float half_height = height / 2.0;
 		return Matrix4x4f(half_width, 0, 0, half_width,

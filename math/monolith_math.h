@@ -71,10 +71,10 @@ public:
 		e[3] /= k;
 		return *this;
 	}
-	inline float operator[](int index) {
+	inline float operator[](int index) const {
 		return e[index];
 	}
-	inline float operator()(int index) {
+	inline float operator()(int index) const {
 		return e[index];
 	}
 
