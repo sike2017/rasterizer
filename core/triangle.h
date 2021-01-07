@@ -15,8 +15,8 @@ public:
 
 class Vertex {
 public:
-	Vertex() {}
-	Vertex(const Point3f& _p) { p = _p; }
+	Vertex() { hadColor = false; }
+	Vertex(const Point3f& _p) { p = _p; hadColor = false; }
 	// 把 Vertex 的位置与矩阵相乘
 	void mul(const Matrix4x4f& m) {
 		p = m * p;
@@ -26,6 +26,7 @@ public:
 	float w;
 	
 	Color color;
+	bool hadColor;
 };
 
 inline Log& operator<<(Log& log, const Vertex& v) {

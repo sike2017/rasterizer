@@ -14,17 +14,17 @@ class Dwindow : public WindowDisplayer {
 public:
 	Dwindow(HINSTANCE thInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow, int _width, int _height, const wchar_t* twindowName)
 		: WindowDisplayer(thInstance, hPrevInstance, szCmdLine, iCmdShow, _width, _height, twindowName), width(_width), height(_height), zbuffer(_width, _height), pos(0.0f), alpha(0.0f), 
-		status(DRAW_PRIMITIVE_SUBSTANCE_LINE | DRAW_PRIMITIVE_SUBSTANCE_FACE), cpuNum(6)
+		status(/*DRAW_PRIMITIVE_SUBSTANCE_LINE | */DRAW_PRIMITIVE_SUBSTANCE_FACE), cpuNum(6)
 		/*renderThreads(cpuNum, renderThreadCallBack, this)*/ {
 		ObjParser objParser;
 		Mesh* mesh;
-		objParser.parse("ssphere.obj", &mesh);
+		objParser.parse("diablo.obj", &mesh);
 		float ka = 0.7;
 		float kd = 0.2;
 		float ks = 0.7;
 		// Color(0.3, 0.56, 0.9)
-		mesh->set_material(new Blinn_Phong(ka, kd, ks, new CheckerTexture(100, 100, Color(0.3, 0.56, 0.9), Color(1, 1, 1))));
-		//mesh->set_material(new Blinn_Phong(0.7, 0.2, 0.2, new ConstantTexture(Color(0.3, 0.56, 0.9))));
+		//mesh->set_material(new Blinn_Phong(ka, kd, ks, new CheckerTexture(100, 100, Color(0.3, 0.56, 0.9), Color(1, 1, 1))));
+		mesh->set_material(new Blinn_Phong(ka, kd, ks, new ConstantTexture(Color(0.3, 0.56, 0.9))));
 		list = new MeshList;
 		list->add(mesh);
 	}
@@ -37,6 +37,10 @@ public:
 	}
 	void setPixel(int x, int y, const RGBA& color) {
 		if (x < 0 || x >= width || y < 0 || y >= height) {
+			return;
+		}
+		if (x == 610 && y == height - 279 - 1) {
+			WindowDisplayer::setPixel(x, y, RGBA(255, 0, 0));
 			return;
 		}
 		WindowDisplayer::setPixel(x, y, color);
@@ -73,7 +77,7 @@ protected:
 		rasterize(*list, width, height, world, cam);
 		zbuffer.resetBuffer();
 		update();
-		return RENDER_STATUS::CALL_STOP_SAVE_IMAGE;
+		return RENDER_STATUS::CALL_NEXTTIME;
 	}
 
 	float pos;
@@ -96,6 +100,32 @@ protected:
 	}
 
 private:
+	bool in_triangle(const Primitive& pr, const Point2f& p) {
+		Vector3f v0 = pr.v[2].p - pr.v[0].p;
+		Vector3f v1 = pr.v[1].p - pr.v[0].p;
+		Vector3f v2 = p - pr.v[0].p;
+
+		float dot00 = dot(v0, v0);
+		float dot01 = dot(v0, v1);
+		float dot02 = dot(v0, v2);
+		float dot11 = dot(v1, v1);
+		float dot12 = dot(v1, v2);
+
+		float inverDeno = 1 / (dot00 * dot11 - dot01 * dot01);
+
+		float u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
+		float a = 0.167;
+		if (u < -a || u > 1 + a) {
+			return false;
+		}
+
+		float v = (dot00 * dot12 - dot01 * dot02) * inverDeno;
+		if (v < -a || v > 1 + a) {
+			return false;
+		}
+
+		return u + v <= 1;
+	}
 	Color sky_color(int x, int y) {
 		Color t = Color(0.7, 0.9, 1.0) - Color(0.5, 0.7, 1.0);
 		Color col = Color(0.7, 0.9, 1.0) - t * (static_cast<float>(y) / height);
@@ -156,10 +186,10 @@ private:
 		float alpha = b.x();
 		float beta = b.y();
 		float gama = b.z();
-		float accurancy = 0.01f;
-		if (alpha < 0.0f - accurancy || alpha > 1.0f + accurancy || beta < 0.0f - accurancy || beta > 1.0f + accurancy || gama < 0.0f - accurancy || gama > 1.0f + accurancy) {
-			return false;
-		}
+		//float accurancy = 0.01f;
+		//if (alpha < 0.0f - accurancy || alpha > 1.0f + accurancy || beta < 0.0f - accurancy || beta > 1.0f + accurancy || gama < 0.0f - accurancy || gama > 1.0f + accurancy) {
+		//	return false;
+		//}
 		float u0 = pr.vt[0].x();
 		float v0 = pr.vt[0].y();
 		float u1 = pr.vt[1].x();
@@ -188,10 +218,10 @@ private:
 		float alpha = b.x();
 		float beta = b.y();
 		float gama = b.z();
-		float accurancy = 0.01f;
-		if (alpha < 0.0f - accurancy || alpha > 1.0f + accurancy || beta < 0.0f - accurancy || beta > 1.0f + accurancy || gama < 0.0f - accurancy || gama > 1.0f + accurancy) {
-			return false;
-		}
+		//float accurancy = 0.01f;
+		//if (alpha < 0.0f - accurancy || alpha > 1.0f + accurancy || beta < 0.0f - accurancy || beta > 1.0f + accurancy || gama < 0.0f - accurancy || gama > 1.0f + accurancy) {
+		//	return false;
+		//}
 		float z0 = pr.v[0].p.z();
 		float z1 = pr.v[1].p.z();
 		float z2 = pr.v[2].p.z();
@@ -212,6 +242,7 @@ private:
 		}
 		Color texture_color = material.texture->value(uv.x(), uv.y());
 		*color = light_color * texture_color;
+		RGBA _debug_color = to_rgba(*color);
 		return true;
 	}
 	void setPixelInPrimitive(int x, int y, const Primitive& pr, const Material& material) {
@@ -282,24 +313,29 @@ private:
 		Matrix4x4f camMatrix = cam.get_transform();
 
 		float aspect = width / static_cast<float>(height);
-		Perspective persp(90, aspect, -1, -100);
+		Perspective persp(40, aspect, -1, -100);
 		Matrix4x4f perspMatrix = persp.get_transform();
 
 		Viewport viewport(width, height);
 		Matrix4x4f viewportMatrix = viewport.get_transform();
 
 		Matrix4x4f m = perspMatrix * camMatrix * world;
-		travelTriangle(list, m, viewportMatrix, light, cam);
+		travelTriangle(list, world, camMatrix, perspMatrix, viewportMatrix, light, cam);
 	}
 	void homogenize(Vertex* v) {
 		v->w = v->p.w();
 		v->p /= v->p.w();
 	}
 	void computeVertex(const Material& material, const Point3f& light, const Point3f& eye, const Vector3f& normal, Vertex* v) {
+		if (v->hadColor) {
+			return;
+		}
 		v->color = material.light_value(*v, light, eye, normal);
+		v->hadColor = true;
 	}
-	void travelTriangle(const MeshList& list, const Matrix4x4f& mvp, const Matrix4x4f& viewport, const Point3f& light, const Camera& cam) {
-		DrawCommand command(DrawCommandEnumClass::DRAW_PRIMITIVE, nullptr, &mvp, &viewport, &light, nullptr, &cam);
+	void travelTriangle(const MeshList& list, const Matrix4x4f& world, const Matrix4x4f& view, const Matrix4x4f& persp, const Matrix4x4f& viewport, const Point3f& light, const Camera& cam) {
+		Matrix4x4f mvp = persp * view * world;
+		//DrawCommand command(DrawCommandEnumClass::DRAW_PRIMITIVE, nullptr, &mvp, &viewport, &light, nullptr, &cam);
 		//int thread_index = 0;
 		//
 		//for (const Mesh* mesh : list) {
@@ -325,15 +361,17 @@ private:
 				primitive = Primitive(*tg);
 				for (int index = 0; index < 3; index++) {
 					makDraw = true;
+					primitive.v[index].mul(world);
+					primitive.vn[index] = unit_vector(world * primitive.vn[index]);
 					computeVertex(*mesh->ptr_mat, light, cam.lookfrom, primitive.vn[index], &primitive.v[index]);
-					primitive.v[index].mul(mvp);
+					primitive.v[index].mul(persp * view);
 					if (primitive.v[index].p.w() == 0.0f) return;
 					homogenize(&primitive.v[index]);
 					if (cull(primitive.v[index])) makDraw = false;
 					//if (!clip(primitive, primitive->v[index], &p0, &p1)) makDraw = false;
 					primitive.v[index].mul(viewport);
-					primitive.v[index].p.rx() = round(primitive.v[index].p.x());
-					primitive.v[index].p.ry() = round(primitive.v[index].p.y());
+					primitive.v[index].p.rx() = primitive.v[index].p.x();
+					primitive.v[index].p.ry() = primitive.v[index].p.y();
 				}
 				drawPrimitive(primitive, *mesh->ptr_mat, status);
 			}
@@ -379,41 +417,62 @@ private:
 			}
 		}
 	}
+	//void fillBottomFlatTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2, const Primitive& pr, const Material& material) {
+	//	float invslope0 = range_wide(v1.p.x() - v0.p.x()) / (v1.p.y() - v0.p.y());
+	//	float invslope1 = range_wide(v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
+	//	float curx0 = v0.p.x();
+	//	float curx1 = v0.p.x();
+	//	for (int scanlineY = v0.p.y(); scanlineY >= v1.p.y(); scanlineY--) {
+	//		drawScanline(curx0, curx1, scanlineY, pr, material);
+	//		curx0 -= invslope0;
+	//		curx1 -= invslope1;
+	//	}
+	//}
 	void fillBottomFlatTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2, const Primitive& pr, const Material& material) {
-		float invslope0 = (v1.p.x() - v0.p.x()) / (v1.p.y() - v0.p.y());
-		float invslope1 = (v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
-		float curx0 = v0.p.x();
-		float curx1 = v0.p.x();
-		for (int scanlineY = v0.p.y(); scanlineY >= v1.p.y(); scanlineY--) {
-			drawScanline(curx0, curx1, scanlineY, pr, material);
-			curx0 -= invslope0;
-			curx1 = std::ceil(curx1 - invslope1);
+		int xs[3] = { v0.p.x(), v1.p.x(), v2.p.x() };
+		int ys[3] = { v0.p.y(), v1.p.y(), v2.p.y() };
+		std::sort(xs, xs + 3); // min to max
+		std::sort(ys, ys + 3); // min to max
+		Point2f p;
+		for (int x = xs[0] - 0.5; x < xs[2] + 0.5; x++) {
+			for (int y = ys[0] - 0.5; y < ys[2] + 0.5; y++) {
+				p = Point2f(x, y);
+				if (in_triangle(pr, p)) {
+					setPixelInPrimitive(x, y, pr, material);
+				}
+			}
 		}
 	}
+	//void fillTopFlatTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2, const Primitive& pr, const Material& material) {
+	//	float invslope0 = range_wide(v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
+	//	float invslope1 = range_wide(v2.p.x() - v1.p.x()) / (v2.p.y() - v1.p.y());
+
+	//	float curx0 = v2.p.x() + 0.5f;
+	//	float curx1 = v2.p.x() + 0.5f;
+
+	//	for (int scanlineY = v2.p.y(); scanlineY <= v0.p.y(); scanlineY++) {
+	//		drawScanline(range_wide(curx0), range_wide(curx1), scanlineY, pr, material);
+	//		//curx0 = std::ceil(curx0 + invslope0);
+	//		curx0 += invslope0;
+	//		curx1 += invslope1;
+	//	}
+	//}
 	void fillTopFlatTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2, const Primitive& pr, const Material& material) {
-		float invslope0 = (v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
-		float invslope1 = (v2.p.x() - v1.p.x()) / (v2.p.y() - v1.p.y());
-
-		float curx0 = v2.p.x();
-		float curx1 = v2.p.x();
-
-		for (int scanlineY = v2.p.y(); scanlineY <= v0.p.y(); scanlineY++) {
-			drawScanline(curx0, curx1, scanlineY, pr, material);
-			curx0 = std::ceil(curx0 + invslope0);
-			curx1 += invslope1;
+		int xs[3] = { v0.p.x(), v1.p.x(), v2.p.x() };
+		int ys[3] = { v0.p.y(), v1.p.y(), v2.p.y() };
+		std::sort(xs, xs + 3); // min to max
+		std::sort(ys, ys + 3); // min to max
+		Point2f p;
+		for (int x = xs[0]; x < xs[2]; x++) {
+			for (int y = ys[0]; y < ys[2]; y++) {
+				p = Point2f(x, y);
+				if (in_triangle(pr, p)) {
+					setPixelInPrimitive(x, y, pr, material);
+				}
+			}
 		}
 	}
 	void drawPrimitive(const Primitive& pr, const Material& material, DRAW_PRIMITIVE_SUBSTANCE_STATUS status) {
-		if (status & DRAW_PRIMITIVE_SUBSTANCE_VERTEX) {
-			setPixel(pr.v[0].p.x(), pr.v[0].p.y(), to_rgba(Color(1, 1, 1)));
-			setPixel(pr.v[1].p.x(), pr.v[1].p.y(), to_rgba(Color(1, 1, 1)));
-			setPixel(pr.v[2].p.x(), pr.v[2].p.y(), to_rgba(Color(1, 1, 1)));
-		}
-		if (status & DRAW_PRIMITIVE_SUBSTANCE_LINE) {
-			drawLine(pr.v[0].p.x(), pr.v[0].p.y(), pr.v[1].p.x(), pr.v[1].p.y(), Color(0.95, 0.4, 0.23));
-			drawLine(pr.v[1].p.x(), pr.v[1].p.y(), pr.v[2].p.x(), pr.v[2].p.y(), Color(0.95, 0.4, 0.23));
-			drawLine(pr.v[2].p.x(), pr.v[2].p.y(), pr.v[0].p.x(), pr.v[0].p.y(), Color(0.95, 0.4, 0.23));
-		}
 		if (status & DRAW_PRIMITIVE_SUBSTANCE_FACE) {
 			const Vertex* v0, * v1, * v2;
 			sortDescendingByY(pr.v[0], pr.v[1], pr.v[2], &v0, &v1, &v2);
@@ -430,6 +489,16 @@ private:
 				fillBottomFlatTriangle(*v0, *v1, vnew, pr, material);
 				fillTopFlatTriangle(*v1, vnew, *v2, pr, material);
 			}
+		}
+		if (status & DRAW_PRIMITIVE_SUBSTANCE_LINE) {
+			drawLine(pr.v[0].p.x(), pr.v[0].p.y(), pr.v[1].p.x(), pr.v[1].p.y());
+			drawLine(pr.v[1].p.x(), pr.v[1].p.y(), pr.v[2].p.x(), pr.v[2].p.y());
+			drawLine(pr.v[2].p.x(), pr.v[2].p.y(), pr.v[0].p.x(), pr.v[0].p.y());
+		}
+		if (status & DRAW_PRIMITIVE_SUBSTANCE_VERTEX) {
+			setPixel(pr.v[0].p.x(), pr.v[0].p.y(), to_rgba(Color(1, 1, 1)));
+			setPixel(pr.v[1].p.x(), pr.v[1].p.y(), to_rgba(Color(1, 1, 1)));
+			setPixel(pr.v[2].p.x(), pr.v[2].p.y(), to_rgba(Color(1, 1, 1)));
 		}
 	}
 

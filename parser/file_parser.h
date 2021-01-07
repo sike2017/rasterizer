@@ -51,10 +51,10 @@ public:
 		}
 		std::string lineStr;
 		Mesh* mesh = new Mesh;
-		int vnIndex = 0;
 		std::vector<Vertex*>& vArray = mesh->vArray;
 		std::vector<Point2f*>& vtArray = mesh->vtArray;
 		std::vector<Vector3f*>& vnArray = mesh->vnArray;
+		std::vector<float> v_vector;
 		while (std::getline(moduleFile, lineStr)) {
 			std::pair<ParserInstruction, std::vector<float>> lineResult;
 			if (lineParse(lineStr, &lineResult)) {
@@ -63,81 +63,57 @@ public:
 					vArray.push_back(vertex);
 				}
 				else if (lineResult.first == ParserInstruction::f) {
-					int v0 = -1;
-					int v1 = -1;
-					int v2 = -1;
-					int v3 = -1;
-					int vt0 = -1;
-					int vt1 = -1;
-					int vt2 = -1;
-					int vt3 = -1;
-					int vn0 = -1;
-					int vn1 = -1;
-					int vn2 = -1;
-					int vn3 = -1;
-					bool isFourVertex = true;
+					int vertex_n = 3;
 					switch (lineResult.second.size()) {
-					case 12:
-						// f v/vt/vn v/vt/vn v/vt/vn v/vt/vn
-						v0 = lineResult.second[0] - 1;
-						v1 = lineResult.second[3] - 1;
-						v2 = lineResult.second[6] - 1;
-						v3 = lineResult.second[9] - 1;
-						vt0 = lineResult.second[1] - 1;
-						vt1 = lineResult.second[4] - 1;
-						vt2 = lineResult.second[7] - 1;
-						vt3 = lineResult.second[10] - 1;
-						vn0 = lineResult.second[2] - 1;
-						vn1 = lineResult.second[5] - 1;
-						vn2 = lineResult.second[8] - 1;
-						vn3 = lineResult.second[11] - 1;
-						break;
 					case 3:
 						// f v v v
-						isFourVertex = false;
-						v0 = lineResult.second[0] - 1;
-						v1 = lineResult.second[1] - 1;
-						v2 = lineResult.second[2] - 1;
+						vertex_n = 3;
+						for (int index = 0; index < vertex_n; index++) {
+							v_vector.push_back(lineResult.second[index]);
+							v_vector.push_back(0);
+							v_vector.push_back(0);
+						}
 						vtArray.push_back(new Point2f(0, 0));
-						vt0 = vt1 = vt2 = 0;
-						vnArray.push_back(new Vector3f(computeNormal(vArray[v0]->p, vArray[v1]->p, vArray[v2]->p)));
-						vn0 = vn1 = vn2 = 0;
+						vnArray.push_back(new Vector3f(computeNormal(vArray[lineResult.second[0]-1]->p, vArray[lineResult.second[1]-1]->p, vArray[lineResult.second[2]-1]->p)));
 						break;
-					case 9:
-						// f v/vt/vn v/vt/vn v/vt/vn
-						isFourVertex = false;
-						v0 = lineResult.second[0] - 1;
-						v1 = lineResult.second[3] - 1;
-						v2 = lineResult.second[6] - 1;
-						vt0 = lineResult.second[1] - 1;
-						vt1 = lineResult.second[4] - 1;
-						vt2 = lineResult.second[7] - 1;
-						vn0 = lineResult.second[2] - 1;
-						vn1 = lineResult.second[5] - 1;
-						vn2 = lineResult.second[8] - 1;
+					case 4:
+						// f v v v v
+						vertex_n = 4;
+						for (int index = 0; index < vertex_n; index++) {
+							v_vector.push_back(lineResult.second[index]);
+							v_vector.push_back(0);
+							v_vector.push_back(0);
+						}
+						vtArray.push_back(new Point2f(0, 0));
+						vnArray.push_back(new Vector3f(computeNormal(vArray[lineResult.second[0]-1]->p, vArray[lineResult.second[1]-1]->p, vArray[lineResult.second[2]-1]->p)));
 						break;
 					default:
-						rlog << "obj f line error\n";
-						return false;
+						// f v/vt/vn v/vt/vn v/vt/vn v/vt/vn ....
+						vertex_n = lineResult.second.size() / 3;
+						v_vector = lineResult.second;
 					}
-					if (isFourVertex) {
-						Triple<Vertex*> vTriple0(vArray[v0], vArray[v1], vArray[v2]);
-						Triple<Vertex*> vTriple1(vArray[v0], vArray[v2], vArray[v3]);
-						Triple<Point2f*> vtTriple0(vtArray[vt0], vtArray[vt1], vtArray[vt2]);
-						Triple<Point2f*> vtTriple1(vtArray[vt0], vtArray[vt2], vtArray[vt3]);
-						Triple<Vector3f*> vnTriple0(vnArray[vn0], vnArray[vn1], vnArray[vn2]);
-						Triple<Vector3f*> vnTriple1(vnArray[vn0], vnArray[vn2], vnArray[vn3]);
-						Triangle* tg0 = new Triangle(vTriple0, vtTriple0, vnTriple0);
-						Triangle* tg1 = new Triangle(vTriple1, vtTriple1, vnTriple1);
-						mesh->add(tg0);
-						mesh->add(tg1);
-					}
-					else {
-						Triple<Vertex*> vTriple0(vArray[v0], vArray[v1], vArray[v2]);
-						Triple<Point2f*> vtTriple0(vtArray[vt0], vtArray[vt1], vtArray[vt2]);
-						Triple<Vector3f*> vnTriple0(vnArray[vn0], vnArray[vn1], vnArray[vn2]);
-						Triangle* tg0 = new Triangle(vTriple0, vtTriple0, vnTriple0);
-						mesh->add(tg0);
+					int triangle_n = vertex_n - 2;
+					int v0;
+					int v1;
+					int v2;
+					int v[3];
+					int vt[3];
+					int vn[3];
+					for (int index = 0; index < triangle_n; index++) {
+						v0 = 0;
+						v1 = 3 * (1 + index);
+						v2 = 3 * (2 + index);
+						v[0] = v_vector[v0] - 1;
+						v[1] = v_vector[v1] - 1;
+						v[2] = v_vector[v2] - 1;
+						vt[0] = v_vector[v0 + 1] - 1;
+						vt[1] = v_vector[v1 + 1] - 1;
+						vt[2] = v_vector[v2 + 1] - 1;
+						vn[0] = v_vector[v0 + 2] - 1;
+						vn[1] = v_vector[v1 + 2] - 1;
+						vn[2] = v_vector[v2 + 2] - 1;
+						mesh->add(
+							new Triangle(Triple<Vertex*>(vArray[v[0]], vArray[v[1]], vArray[v[2]]), Triple<Point2f*>(vtArray[vt[0]], vtArray[vt[1]], vtArray[vt[2]]), Triple<Vector3f*>(vnArray[vn[0]], vnArray[vn[1]], vnArray[vn[2]])));
 					}
 				}
 				else if (lineResult.first == ParserInstruction::vn) {
@@ -157,7 +133,7 @@ private:
 	inline bool isFloatString(const std::string& str) {
 		for (const char& le : str) {
 			if (le != '-' && le != '.' && le != '0' && le != '1' && le != '2' && le != '3' && le != '4'
-				&& le != '5' && le != '6' && le != '7' && le != '8' && le != '9' && le != '+' && le != 'e') {
+				&& le != '5' && le != '6' && le != '7' && le != '8' && le != '9' && le != '+' && le != 'e' && le != ' ') {
 				return false;
 			}
 		}
@@ -288,7 +264,7 @@ private:
 				index++;
 				if (tl != '/') {
 					if (tl != '0' && tl != '1' && tl != '2' && tl != '3' && tl != '4'
-						&& tl != '5' && tl != '6' && tl != '7' && tl != '8' && tl != '9') {
+						&& tl != '5' && tl != '6' && tl != '7' && tl != '8' && tl != '9' && tl != ' ') {
 						return false;
 					}
 					else {
@@ -311,4 +287,3 @@ private:
 
 	std::map<std::string, ParserInstruction> table;
 };
-
