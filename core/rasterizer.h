@@ -27,6 +27,7 @@ public:
 		mesh->set_material(new Blinn_Phong(ka, kd, ks, new ConstantTexture(Color(0.3, 0.56, 0.9))));
 		list = new MeshList;
 		list->add(mesh);
+		fovy = 40.0f;
 	}
 	~Dwindow() {
 		
@@ -100,7 +101,9 @@ protected:
 	}
 
 private:
-	bool in_triangle(const Primitive& pr, const Point2f& p) {
+	bool in_triangle(const Primitive& pr, Point2f p) {
+		p.rx() = std::round(p.x());
+		p.ry() = std::round(p.y());
 		Vector3f v0 = pr.v[2].p - pr.v[0].p;
 		Vector3f v1 = pr.v[1].p - pr.v[0].p;
 		Vector3f v2 = p - pr.v[0].p;
@@ -111,20 +114,20 @@ private:
 		float dot11 = dot(v1, v1);
 		float dot12 = dot(v1, v2);
 
-		float inverDeno = 1 / (dot00 * dot11 - dot01 * dot01);
+		double inverDeno = 1 / (dot00 * dot11 - dot01 * dot01);
 
-		float u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
-		float a = 0.167;
+		double u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
+		double a = DBL_MIN;
 		if (u < -a || u > 1 + a) {
 			return false;
 		}
 
-		float v = (dot00 * dot12 - dot01 * dot02) * inverDeno;
+		double v = (dot00 * dot12 - dot01 * dot02) * inverDeno;
 		if (v < -a || v > 1 + a) {
 			return false;
 		}
 
-		return u + v <= 1;
+		return u + v <= 1 + a;
 	}
 	Color sky_color(int x, int y) {
 		Color t = Color(0.7, 0.9, 1.0) - Color(0.5, 0.7, 1.0);
@@ -313,7 +316,7 @@ private:
 		Matrix4x4f camMatrix = cam.get_transform();
 
 		float aspect = width / static_cast<float>(height);
-		Perspective persp(40, aspect, -1, -100);
+		Perspective persp(fovy, aspect, -1, -100);
 		Matrix4x4f perspMatrix = persp.get_transform();
 
 		Viewport viewport(width, height);
@@ -434,8 +437,8 @@ private:
 		std::sort(xs, xs + 3); // min to max
 		std::sort(ys, ys + 3); // min to max
 		Point2f p;
-		for (int x = xs[0] - 0.5; x < xs[2] + 0.5; x++) {
-			for (int y = ys[0] - 0.5; y < ys[2] + 0.5; y++) {
+		for (int x = xs[0] - 0.5; x <= xs[2] + 0.5; x++) {
+			for (int y = ys[0] - 0.5; y <= ys[2] + 0.5; y++) {
 				p = Point2f(x, y);
 				if (in_triangle(pr, p)) {
 					setPixelInPrimitive(x, y, pr, material);
@@ -463,8 +466,8 @@ private:
 		std::sort(xs, xs + 3); // min to max
 		std::sort(ys, ys + 3); // min to max
 		Point2f p;
-		for (int x = xs[0]; x < xs[2]; x++) {
-			for (int y = ys[0]; y < ys[2]; y++) {
+		for (int x = xs[0] - 0.5; x < xs[2] + 0.5; x++) {
+			for (int y = ys[0] - 0.5; y < ys[2] + 0.5; y++) {
 				p = Point2f(x, y);
 				if (in_triangle(pr, p)) {
 					setPixelInPrimitive(x, y, pr, material);
@@ -520,4 +523,5 @@ private:
 	Primitive primitive;
 	Primitive p0;
 	Primitive p1;
+	float fovy;
 };
