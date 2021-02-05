@@ -18,13 +18,13 @@ public:
 		/*renderThreads(cpuNum, renderThreadCallBack, this)*/ {
 		ObjParser objParser;
 		Mesh* mesh;
-		objParser.parse("diablo.obj", &mesh);
+		objParser.parse("spot/spot_triangulated_good.obj", &mesh);
 		float ka = 0.7;
 		float kd = 0.2;
 		float ks = 0.7;
 		// Color(0.3, 0.56, 0.9)
 		//mesh->set_material(new Blinn_Phong(ka, kd, ks, new CheckerTexture(100, 100, Color(0.3, 0.56, 0.9), Color(1, 1, 1))));
-		mesh->set_material(new Blinn_Phong(ka, kd, ks, new ConstantTexture(Color(0.3, 0.56, 0.9))));
+		mesh->set_material(new Blinn_Phong(ka, kd, ks, new ImageTexture("spot/spot_texture.png")));
 		list = new MeshList;
 		list->add(mesh);
 		fovy = 40.0f;

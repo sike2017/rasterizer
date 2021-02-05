@@ -1,8 +1,8 @@
 #pragma once
+#include <cmath>
 #include <assert.h>
 #include "color.h"
-#include "rz_types.h"
-#include "mesh.h"
+#include "display/image_png.h"
 
 inline float rangeFloat(const float& min, const float& max, const float& v) {
 	if (v < min) return min;
@@ -51,6 +51,30 @@ public:
 	int width, height;
 };
 
+class ImageTexture : public Texture {
+public:
+	ImageTexture(const std::string& image_file) {
+		image = image_png::load_image(image_file.c_str());
+	}
+	~ImageTexture() {
+		image_png::free_image(&image);
+	}
+	virtual Color value(float u, float v) const override {
+		int i = (u)*image.width;
+		int j = (1 - v) * image.height - 0.001;
+		if (i < 0) i = 0;
+		if (j < 0) j = 0;
+		if (j > image.width - 1) j = image.width - 1;
+		if (j > image.height - 1) j = image.height - 1;
+		float r = int(image.p_buffer[3 * i + 3 * image.width * j]) / 255.0;
+		float g = int(image.p_buffer[3 * i + 3 * image.height * j + 1]) / 255.0;
+		float b = int(image.p_buffer[3 * i + 3 * image.height * j + 2]) / 255.0;
+		return Color(r, g, b);
+	}
+
+	image_png::image_t image;
+};
+
 class ConstantTexture : public Texture {
 public:
 	ConstantTexture(const Color& _color) { color = _color; }
@@ -60,7 +84,7 @@ public:
 	Color color;
 };
 
-inline void barycentric(const Point2f& q, const Point2f& p0, const Point2f& p1, const Point2f& p2, Point2f* out) {
+inline void barycentric(const Point2f& q, const Point2f& p0, const Point2f& p1, const Point2f& p2, Point3f* out) {
 	float gama = ((p0.y() - p1.y()) * q.x() + (p1.x() - p0.x()) * q.y() + p0.x() * p1.y() - p1.x() * p0.y()) /
 		((p0.y() - p1.y()) * p2.x() + (p1.x() - p0.x()) * p2.y() + p0.x() * p1.y() - p1.x() * p0.y());
 	float beta = ((p0.y() - p2.y()) * q.x() + (p2.x() - p0.x()) * q.y() + p0.x() * p2.y() - p2.x() * p0.y()) /

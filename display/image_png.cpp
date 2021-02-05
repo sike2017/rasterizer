@@ -5,6 +5,14 @@
 #include "stb/stb_image_write.h"
 
 namespace image_png {
+	image_t load_image(const char* filename)
+	{
+		image_t mg;
+		mg.p_buffer = stbi_load(filename, &mg.width, &mg.height, &mg.channels_number, 0);
+		printf("get\n");
+		return mg;
+	}
+
 	image_t create_image(int width, int height)
 	{
 		size_t size = static_cast<long long>(width) * static_cast<long long>(height) * CHANNELS_NUMBER;
