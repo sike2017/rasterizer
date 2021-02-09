@@ -5,11 +5,11 @@ A simple rasterizer from strach.
 
 
 Support Features:
-  Blinn-Phong material
+  - Blinn-Phong material
   
-  Obj model loading and rendering
+  - Obj model loading and rendering
   
-  texture
+  - texture
   
-  single light
+  - single light
   
