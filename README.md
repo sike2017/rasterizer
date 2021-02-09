@@ -8,4 +8,4 @@ Support Features:
   - Blinn-Phong material
   - Obj model loading and rendering
   - texture
-  - single light
+  - single point light computing
