@@ -18,9 +18,10 @@ public:
 		/*renderThreads(cpuNum, renderThreadCallBack, this)*/ {
 		ObjParser objParser;
 		Mesh* mesh;
-		objParser.parse("spot/spot_triangulated_good.obj", &mesh);
-		float ka = 0.7;
-		float kd = 0.2;
+		if (!objParser.parse("spot/spot_triangulated_good.obj", &mesh))
+			exit(-1);
+		float ka = 0.2;
+		float kd = 0.5;
 		float ks = 0.7;
 		// Color(0.3, 0.56, 0.9)
 		//mesh->set_material(new Blinn_Phong(ka, kd, ks, new CheckerTexture(100, 100, Color(0.3, 0.56, 0.9), Color(1, 1, 1))));
@@ -40,7 +41,7 @@ public:
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return;
 		}
-		if (x == 610 && y == height - 279 - 1) {
+		if (x == 512 && y == height - 259 - 1) {
 			WindowDisplayer::setPixel(x, y, RGBA(255, 0, 0));
 			return;
 		}
@@ -69,7 +70,7 @@ protected:
 	virtual RENDER_STATUS render() override {
 		Color col;
 		uint8_t ur, ug, ub;
-		Point3f lookfrom(0.0, 0 + pos, 2.5);
+		Point3f lookfrom(0.0, 2.0 + pos, 5.0);
 		Point3f lookat(0, 0, 0);
 		Vector3f vup(0, 1, 0);
 		Camera cam(lookfrom, lookat, vup);
@@ -97,7 +98,10 @@ protected:
 		if (screen_keys[VK_RIGHT]) {
 			alpha -= 1;
 		}
-		//rlog << "keyboardEvent\n";
+		if (screen_keys[VK_ESCAPE]) {
+			rlog << "escape exit\n";
+			exit(0);
+		}
 	}
 
 private:
@@ -117,7 +121,7 @@ private:
 		double inverDeno = 1 / (dot00 * dot11 - dot01 * dot01);
 
 		double u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
-		double a = DBL_MIN;
+		double a = 0.00001;
 		if (u < -a || u > 1 + a) {
 			return false;
 		}
@@ -421,8 +425,8 @@ private:
 		}
 	}
 	//void fillBottomFlatTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2, const Primitive& pr, const Material& material) {
-	//	float invslope0 = range_wide(v1.p.x() - v0.p.x()) / (v1.p.y() - v0.p.y());
-	//	float invslope1 = range_wide(v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
+	//	float invslope0 = (v1.p.x() - v0.p.x()) / (v1.p.y() - v0.p.y());
+	//	float invslope1 = (v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
 	//	float curx0 = v0.p.x();
 	//	float curx1 = v0.p.x();
 	//	for (int scanlineY = v0.p.y(); scanlineY >= v1.p.y(); scanlineY--) {
@@ -437,8 +441,8 @@ private:
 		std::sort(xs, xs + 3); // min to max
 		std::sort(ys, ys + 3); // min to max
 		Point2f p;
-		for (int x = xs[0] - 0.5; x <= xs[2] + 0.5; x++) {
-			for (int y = ys[0] - 0.5; y <= ys[2] + 0.5; y++) {
+		for (int x = xs[0] - 0.5 - FLT_MIN; x <= xs[2] + 0.5 + FLT_MIN; x++) {
+			for (int y = ys[0] - 0.5 - FLT_MIN; y <= ys[2] + 0.5 + FLT_MIN; y++) {
 				p = Point2f(x, y);
 				if (in_triangle(pr, p)) {
 					setPixelInPrimitive(x, y, pr, material);
@@ -447,14 +451,14 @@ private:
 		}
 	}
 	//void fillTopFlatTriangle(const Vertex& v0, const Vertex& v1, const Vertex& v2, const Primitive& pr, const Material& material) {
-	//	float invslope0 = range_wide(v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
-	//	float invslope1 = range_wide(v2.p.x() - v1.p.x()) / (v2.p.y() - v1.p.y());
+	//	float invslope0 = (v2.p.x() - v0.p.x()) / (v2.p.y() - v0.p.y());
+	//	float invslope1 = (v2.p.x() - v1.p.x()) / (v2.p.y() - v1.p.y());
 
 	//	float curx0 = v2.p.x() + 0.5f;
 	//	float curx1 = v2.p.x() + 0.5f;
 
 	//	for (int scanlineY = v2.p.y(); scanlineY <= v0.p.y(); scanlineY++) {
-	//		drawScanline(range_wide(curx0), range_wide(curx1), scanlineY, pr, material);
+	//		drawScanline(curx0, curx1, scanlineY, pr, material);
 	//		//curx0 = std::ceil(curx0 + invslope0);
 	//		curx0 += invslope0;
 	//		curx1 += invslope1;
@@ -509,6 +513,7 @@ private:
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				setPixel(x, y, to_rgba(sky_color(x, y)));
+				setPixel(x, y, RGBA(0, 0, 0, 255));
 			}
 		}
 	}

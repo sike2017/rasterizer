@@ -1,11 +1,9 @@
 #pragma once
 #include <Windows.h>
 #include "Painter.h"
-
 #include "log/log.h"
 
 extern Painter painter;
-
 // do not using this namespace in your program!
 namespace display
 {
@@ -65,6 +63,8 @@ protected:
 		colorIndex = !colorIndex;
 
 		update();
+
+
 		return RENDER_STATUS::CALL_NEXTTIME;
 	}
 	virtual void keyboardEvent(int* screen_keys) {}

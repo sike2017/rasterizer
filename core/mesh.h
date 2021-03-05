@@ -21,6 +21,8 @@ public:
 		}
 	}
 	void set_material(Material* ptr_texture) {
+		if (ptr_mat == nullptr)
+			delete ptr_mat;
 		ptr_mat = ptr_texture;
 	}
 

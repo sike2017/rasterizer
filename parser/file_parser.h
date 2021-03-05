@@ -15,8 +15,7 @@ protected:
 	inline bool openFile(const std::string& filename) {
 		moduleFile = std::ifstream(filename, std::ios::in);
 		if (!moduleFile.is_open()) {
-			rlog << "open module file error\n";
-			return false;
+			rlog << "open model file error\n";
 		}
 		return true;
 	}
