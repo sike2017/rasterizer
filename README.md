@@ -9,3 +9,7 @@ Support Features:
   - Obj model loading and rendering
   - texture
   - single point light computing
+
+![avatar](spot_image.png)
+
+
