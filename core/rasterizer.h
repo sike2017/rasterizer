@@ -41,10 +41,10 @@ public:
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return;
 		}
-		if (x == 512 && y == height - 259 - 1) {
-			WindowDisplayer::setPixel(x, y, RGBA(255, 0, 0));
-			return;
-		}
+		//if (x == 512 && y == height - 259 - 1) {
+		//	WindowDisplayer::setPixel(x, y, RGBA(255, 0, 0));
+		//	return;
+		//}
 		WindowDisplayer::setPixel(x, y, color);
 	}
 
